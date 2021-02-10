@@ -25,9 +25,11 @@ var sumBox = document.querySelector('#descrip');
 var insertTrailer = document.querySelector('#movieTrailer');
 var trailerEl = document.createElement('iframe');
 var movieTitleSpan = document.createElement('h2');
-var summarySpan = document.createElement('p')
-
+var summarySpan = document.createElement('p');
+var notFound = document.getElementById('notFound');
+var showMovieEl = document.getElementById('showmovie');
 var introEl = document.getElementById('instructions');
+
 // event listener that will take user to their watched movies page
 btnPage.addEventListener('click', function() {
     location.assign('watched.html');
@@ -66,10 +68,12 @@ btnSave.addEventListener('click', function() {
 // hide instructions to get movie
 function hideIntro(){
     
-    introEl.style.display = 'none'
+    notFound.style.display = 'none';
     
-    var showMovieEl = document.getElementById('showmovie');
-    showMovieEl.style.display = 'block'
+    introEl.style.display = 'none';
+    
+    showMovieEl.style.display = 'block';
+
     
 };
 
@@ -214,10 +218,10 @@ function tmMovieSearch(updatedtmUrl) {
 };
 
 function noMovie() {
-    var notFound = document.getElementById('notFound');
-
     introEl.style.display = 'none';
     notFound.style.display = 'block';
+    showMovieEl.style.display = 'none';
+
 }
 
 // Function to choose random movie 
@@ -230,8 +234,13 @@ function randomMovie(returnJson){
     insertMovieInfo(movieOption);
 };
 
+
 /// First step of using MovieID to get  Youtube ID for trailer
-function tmTrailerSearch(searchMovie) {
+function tmTrailerSearch(searchMovie, posterPath) {
+    console.log(posterPath);
+    //Clears Poster Img 
+    insertTrailer.innerHTML= '';
+    
     var plugInUrl = 'https://api.themoviedb.org/3/movie/' + searchMovie + '/videos?api_key=efcca3762e356b7b95982ec994db2fbc&language=en-US';
     var searchTrailerUrl = plugInUrl;
     console.log(searchTrailerUrl)
@@ -243,18 +252,37 @@ function tmTrailerSearch(searchMovie) {
                 response.json()
                 .then(function(data) {
                 console.log(data);
+                // Checks to see if there is a movie Trailer available
+                //If not grabs movie poster path
+                console.log(data.results.length)
                 
-                // youtubeTrailer(data);
+                if(data.results.length < 1){
+                    setPoster(posterPath)
+                    console.log(posterPath);
+                    console.log('-----Search FOR POSTER----')
+                }else {
+                    console.log('-----Found Trailer----')
+                    youtubeTrailer(data);
+                }
             });
-            
             }
-            
         })
-        
 };
+// Display's movie Poster
+function setPoster(posterPath){
+    console.log(posterPath);
+    var posterEl = document.createElement('img');
+    var posterUrl = 'https://image.tmdb.org/t/p/w342' + posterPath;
+    
+    console.log(posterUrl);
 
+    posterEl.setAttribute('src', posterUrl)
+
+    insertTrailer.appendChild(posterEl);
+}
 //  Uses Movie ID to get Youtube ID \\\\\\\\
 function youtubeTrailer(data){
+
     var yourTrailer = data.results[0]
     console.log(yourTrailer)
     var searchIt = yourTrailer.key
@@ -291,8 +319,8 @@ function parseTrailer(trailer) {
 };
 
 // Adds Movie title and description to designated area
-function insertMovieInfo(movieOption){
-        
+function insertMovieInfo(movieOption, posterPath){
+
     movieTitleSpan.textContent = movieOption.title;
     movieTitleEl.appendChild(movieTitleSpan);
 
@@ -300,7 +328,9 @@ function insertMovieInfo(movieOption){
     sumBox.appendChild(summarySpan);
 
     var searchMovie = movieOption.id;
-    tmTrailerSearch(searchMovie)
+    var posterPath = movieOption.poster_path;
+    console.log(posterPath);
+    tmTrailerSearch(searchMovie, posterPath)
 };
 
 // inserts the movie trailer
