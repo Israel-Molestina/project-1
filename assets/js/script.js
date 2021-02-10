@@ -131,7 +131,6 @@ function tmDirectorSearch (updatedtmUrl) {
 
                 if (response.ok) {
 
-
                     console.log('-----'+ response.url);
 
                     response.json()
@@ -233,7 +232,6 @@ function randomMovie(returnJson){
 
     insertMovieInfo(movieOption);
 };
-
 
 /// First step of using MovieID to get  Youtube ID for trailer
 function tmTrailerSearch(searchMovie, posterPath) {
@@ -340,7 +338,6 @@ function insertMovieTrailer(newVidHTTP) {
     insertTrailer.appendChild(trailerEl);
 
 };
-
 
 // ombd fetch request for extra info on movie
 // function omMovieSearch() {
